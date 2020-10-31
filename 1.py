@@ -7,9 +7,9 @@ import shutil
 from PIL import Image
 from tqdm import tqdm
 import cvlib as cv
-import sys
+import face_recognition
 
-#Load images from URL links in the JSON file to the "Images" list
+#Load images from URL links in the JSON file to the "Images" list & store them locally to be used by the first classifier.
 def LoadImages():
     imagesCount=0
     facesCount=0
@@ -23,37 +23,37 @@ def LoadImages():
         del response
         img = Image.open('my_image.jpg')   
         img = np.asarray(img)
-        
+        cv2.imwrite('./loaded_images/image{}.png'.format(imagesCount),img)
         images.append(img)
         imagesCount +=1
     return imagesCount, facesCount
 
 #Detect Faces in the images and save their coordinates and pass them to the "DrawRectangles" function
-#It's based on 2 classifiers, the first one is implemented by 2 different ways
-#Firstly, use the cascade classifier, if no faces were detected then resize the image to be (1280,720)
-#then apply the same classifier again.
-#Secondly, if no faces were detected use the API "detectfaces()" provided by the library "cvlib".
+#It's based on 3 different classifiers.
+#Firstly, use the face_detection library, by using APIs provided by it to detect the faces.
+#If no faces were detected, then use the second classifier "haarcascade classifier"
+#Lastly, if no faces were predicted till now then use the last classifier which is implemented from "cvlib" library.
 
-def FindFaces(count):
+def FindFaces(count,imagesCount):
     count=count
     detectedFacesCount = 0
-    for img in tqdm(images):
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        grayscale_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        
-        face_cascade = cv2.CascadeClassifier('D:/Faculty of Engineering/ASU-4 Computer/Graduation Project/Face Detection/Face-Detection/haarcascades/haarcascade_frontalface_alt.xml')
-        detected_faces = face_cascade.detectMultiScale(grayscale_image)
-        if len(detected_faces) > 0:
-            detectedFacesCount += len(detected_faces)
-            count = DrawRectangles(img=img, classifier=1, count=count, detected_faces = detected_faces)
+    
+    for loadedImages in tqdm(range (0, imagesCount)):
+        img = face_recognition.load_image_file('./loaded_images/image{}.png'.format(loadedImages))
+        face_locations = face_recognition.face_locations(img)
+        if len(face_locations) > 0:
+            detectedFacesCount += len(face_locations)
+            count = DrawRectangles(img=img, classifier=1, count=count, face_locations = face_locations)
         else:
-            img = cv2.resize(img, dsize=(1280, 720), interpolation=cv2.INTER_CUBIC)
+            img = images[loadedImages]
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
             grayscale_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            
             face_cascade = cv2.CascadeClassifier('D:/Faculty of Engineering/ASU-4 Computer/Graduation Project/Face Detection/Face-Detection/haarcascades/haarcascade_frontalface_alt.xml')
             detected_faces = face_cascade.detectMultiScale(grayscale_image)
             if len(detected_faces) > 0:
                 detectedFacesCount += len(detected_faces)
-                count = DrawRectangles(img=img, classifier=2,count=count, detected_faces = detected_faces)
+                count = DrawRectangles(img=img, classifier=2, count=count, detected_faces = detected_faces)
             else:
                 faces, confidences = cv.detect_face(img)
                 detectedFacesCount += len(faces)
@@ -61,9 +61,24 @@ def FindFaces(count):
                 
     return detectedFacesCount
 
-
-def DrawRectangles(img, classifier, count, detected_faces=[], faces=[], confidences=[] ):
-    if (classifier == 1 or classifier == 2):
+#Classifier numbers are {1,2,3} 
+#1 => face_detection classifier
+#2 => harrcascade classifier
+#3 => cvlib classifier
+def DrawRectangles(img, classifier, count, detected_faces=[], faces=[], confidences=[], face_locations=[] ):
+    if (classifier == 1 ):
+        for face_location in face_locations:
+            top, right, bottom, left = face_location
+    
+            cv2.rectangle(
+                        img,
+                        (left, top),
+                        (right, bottom),
+                        (0, 255, 0),
+                        2
+                    )
+            
+    elif (classifier == 2):
         for (column, row, width, height) in detected_faces:
                 cv2.rectangle(
                     img,
@@ -84,7 +99,7 @@ def DrawRectangles(img, classifier, count, detected_faces=[], faces=[], confiden
     if(classifier==1):
         cv2.imwrite('./face-detection-images/face_image_{}.jpg'.format(count),img)
     elif (classifier==2):
-        cv2.imwrite('./face-detection-images/face_image_{}_resized.jpg'.format(count),img)
+        cv2.imwrite('./face-detection-images/face_image_{}_haarcascade.jpg'.format(count),img)
     else:
         cv2.imwrite('./face-detection-images/face_image_{}_cvlib.jpg'.format(count),img)
     count += 1
@@ -107,11 +122,12 @@ del jsonData[272]
 
 #call "LoadImages()" function & print the total number of images and faces.
 imagesCount, facesCount= LoadImages()
-print("\n",imagesCount , "images were loaded successfully, Which contains",facesCount,"faces")
+print("\n{} images were loaded successfully, Which contains {} faces".format(imagesCount,facesCount))
 
 #call "FindFaces()" function and print the number of faces detected using different classifiers
-detectedFacesCount = FindFaces(count) 
+detectedFacesCount = FindFaces(count,imagesCount) 
 print("\ndetected", detectedFacesCount, "faces")
 
 #Program terminated successfully without any errors
-print("done")
+accuracy= (detectedFacesCount / facesCount) * 100
+print("Program terminated successfully with accuracy: {} %".format(accuracy))
