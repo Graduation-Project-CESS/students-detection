@@ -19,4 +19,4 @@ Install some packages from anaconda prompt
 
 If you faced any issues while installing dlib or face_recognition please follow this link https://github.com/ageitgey/face_recognition/issues/175
 
-install opencv, tensorflow packages from anaconda navigator
+install opencv, tensorflow, tqdm packages from anaconda navigator
