@@ -14,6 +14,8 @@ Install some packages from anaconda prompt
 	conda install -c conda-forge scikit-image
 	conda install -c menpo opencv3
 	pip install cvlib from anaconda prompt #reference https://github.com/arunponnusamy/cvlib
+	conda install cmake
+	conda install -c conda-forge dlib
 	pip install dlib
 	pip install face_recognition #reference https://pypi.org/project/face-recognition/
 
