@@ -15,13 +15,15 @@ Install some packages from anaconda prompt
 	1- conda install scikit-learn
 	2- conda install -c conda-forge scikit-image
 	3- conda install -c menpo opencv3
-	4- pip install cvlib from anaconda prompt #reference https://github.com/arunponnusamy/cvlib
+	4- pip install cvlib  
+	(#reference https://github.com/arunponnusamy/cvlib)
 	5- conda install cmake
 Either use step 6 or step 7, 
 	6- conda install -c conda-forge dlib
 	7- pip install dlib
 After successfully installing dlib, install face recognition using the following command.
-	8- pip install face_recognition #reference https://pypi.org/project/face-recognition/
+	8- pip install face_recognition 
+	(#reference https://pypi.org/project/face-recognition/)
 
 If you faced any issues while installing dlib or face_recognition please follow this link https://github.com/ageitgey/face_recognition/issues/175
 
