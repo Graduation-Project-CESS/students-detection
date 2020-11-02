@@ -13,10 +13,8 @@ import face_recognition
 def LoadImages():
     imagesCount=0
     facesCount=0
-    for data in tqdm(jsonData):
-        
+    for data in tqdm(jsonData[0:4]):
         facesCount += len(data["annotation"])
-        
         response = requests.get(data['content'], stream=True)
         with open('my_image.jpg', 'wb') as file:
             shutil.copyfileobj(response.raw, file)
@@ -49,7 +47,7 @@ def FindFaces(count,imagesCount):
             img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
             grayscale_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             
-            face_cascade = cv2.CascadeClassifier('D:/Faculty of Engineering/ASU-4 Computer/Graduation Project/Face Detection/Face-Detection/haarcascades/haarcascade_frontalface_alt.xml')
+            face_cascade = cv2.CascadeClassifier('./haarcascades/haarcascade_frontalface_alt.xml')
             detected_faces = face_cascade.detectMultiScale(grayscale_image)
             if len(detected_faces) > 0:
                 detectedFacesCount += len(detected_faces)
@@ -97,17 +95,17 @@ def DrawRectangles(img, classifier, count, detected_faces=[], faces=[], confiden
                     cv2.rectangle(img, (startX,startY), (endX,endY), (0,255,0), 2)
         
     if(classifier==1):
-        cv2.imwrite('./face-detection-images/face_image_{}.jpg'.format(count),img)
+        cv2.imwrite('./face_detection_images/face_image_{}.jpg'.format(count),img)
     elif (classifier==2):
-        cv2.imwrite('./face-detection-images/face_image_{}_haarcascade.jpg'.format(count),img)
+        cv2.imwrite('./face_detection_images/face_image_{}_haarcascade.jpg'.format(count),img)
     else:
-        cv2.imwrite('./face-detection-images/face_image_{}_cvlib.jpg'.format(count),img)
+        cv2.imwrite('./face_detection_images/face_image_{}_cvlib.jpg'.format(count),img)
     count += 1
     return count
 
 # Starting Point of the code
 
-address = 'D:/Faculty of Engineering/ASU-4 Computer/Graduation Project/face_detection.json'
+address = './1.json'
 
 jsonData = []
 images = []
