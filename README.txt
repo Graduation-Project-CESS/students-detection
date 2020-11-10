@@ -1,5 +1,7 @@
-Note that":
-"my_image.jpg" is a temporary image, which is used to store the images in the code & locally in "loaded_images" directory
+Lib folder contains all libraries used in each classifier
+Temp folder contains loaded images from dataset and my_image which is a temporary image used during loading
+datasets folder contains json files we want to test
+face_detection_images folder contains the resulted images of the face detection algorithm
 
 Dependencies:
 Install visual studio (2019 recomended).
