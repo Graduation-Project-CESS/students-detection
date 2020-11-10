@@ -15,7 +15,11 @@ import dlib
 def LoadImages():
     imagesCount=0
     facesCount=0
+<<<<<<< HEAD
     for data in tqdm(jsonData[100:103]):
+=======
+    for data in tqdm(jsonData[20:30]):
+>>>>>>> 25976c9914ac28997cd00fd0c723e57062fe763a
         facesCount += len(data["annotation"])
         response = requests.get(data['content'], stream=True)
         with open('my_image.jpg', 'wb') as file:
@@ -54,11 +58,20 @@ def FindFaces(count,imagesCount):
             except:
                 print("Something went wrong")
             finally:
+<<<<<<< HEAD
                   face_locations = face_recognition.face_locations(grayscale_image)
                   if len(face_locations) > 0:
                       detectedFacesCount += len(face_locations)
                       count = DrawRectangles(img=img, classifier=2, count=count, face_locations = face_locations)
                   else:
+=======
+                 cnn_face = dlib.cnn_face_detection_model_v1('./mmod_human_face_detector.dat')
+                 cnn_face_detector =cnn_face(grayscale_image,1)
+                 if len(cnn_face_detector) > 0:
+                     detectedFacesCount += len(cnn_face_detector)
+                     count = DrawRectangles(img=img, classifier=2, count=count, cnn_face_detector = cnn_face_detector)
+                 else:
+>>>>>>> 25976c9914ac28997cd00fd0c723e57062fe763a
                     face_cascade = cv2.CascadeClassifier('./haarcascades/haarcascade_frontalface_alt.xml')
                     detected_faces = face_cascade.detectMultiScale(grayscale_image)
                     if len(detected_faces) > 0:
@@ -76,7 +89,11 @@ def FindFaces(count,imagesCount):
 #2 => harrcascade classifier
 #3 => cvlib classifier
 def DrawRectangles(img, classifier, count, detected_faces=[], faces=[], confidences=[], face_locations=[], cnn_face_detector=[] ):
+<<<<<<< HEAD
     if (classifier == 2 ):
+=======
+    if (classifier == 1 ):
+>>>>>>> 25976c9914ac28997cd00fd0c723e57062fe763a
         for face_location in face_locations:
             top, right, bottom, left = face_location
     
@@ -87,7 +104,11 @@ def DrawRectangles(img, classifier, count, detected_faces=[], faces=[], confiden
                         (0, 255, 0),
                         2
                     )
+<<<<<<< HEAD
     elif(classifier == 1):
+=======
+    elif(classifier == 2):
+>>>>>>> 25976c9914ac28997cd00fd0c723e57062fe763a
         for cnn_face_detector in cnn_face_detector:
             x = cnn_face_detector.rect.left()
             y = cnn_face_detector.rect.top()
@@ -116,7 +137,11 @@ def DrawRectangles(img, classifier, count, detected_faces=[], faces=[], confiden
         
     if(classifier==2):
         cv2.imwrite('./face_detection_images/face_image_{}.jpg'.format(count),img)
+<<<<<<< HEAD
     elif(classifier==1):
+=======
+    elif(classifier==2):
+>>>>>>> 25976c9914ac28997cd00fd0c723e57062fe763a
         cv2.imwrite('./face_detection_images/face_image_{}CNN.jpg'.format(count),img)
     elif (classifier==3):
         cv2.imwrite('./face_detection_images/face_image_{}_haarcascade.jpg'.format(count),img)  
