@@ -145,15 +145,17 @@ del jsonData[119]
 # delete any content in face-detection images and loaded-images
 folders = ['./Face_detection_images/','./temp/loaded_images/']
 for folder in folders: 
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+        for filename in os.listdir(folder):
+            file_path = os.path.join(folder, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
 # call "LoadImages()" function & print the total number of images and faces.
 imagesCount, facesCount= LoadImages()
 print("\n{} images were loaded successfully, Which contains {} faces".format(imagesCount,facesCount))
