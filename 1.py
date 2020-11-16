@@ -17,7 +17,7 @@ import os, shutil
 def LoadImages():
     imagesCount=0
     facesCount=0
-    for data in tqdm(jsonData[100:103]):
+    for data in tqdm(jsonData[12:14]):
         facesCount += len(data["annotation"])
         response = requests.get(data['content'], stream=True)
         with open('./temp/my_image.jpg', 'wb') as file:
@@ -43,7 +43,10 @@ def FindFaces(count,imagesCount):
     
     for loadedImages in tqdm(range (0, imagesCount)):
         img = face_recognition.load_image_file('./temp/loaded_images/image{}.png'.format(loadedImages))
+        h,w,c = img.shape
         cnn_face = dlib.cnn_face_detection_model_v1('./lib/mmod_human_face_detector.dat')
+        if h>2000 and w > 2000:
+            img=cv2.resize(img, dsize=(1280,720), interpolation=cv2.INTER_CUBIC)
         cnn_face_detector =cnn_face(img,1)
         if len(cnn_face_detector) > 0:
             detectedFacesCount += len(cnn_face_detector)
@@ -129,7 +132,7 @@ def DrawRectangles(img, classifier, count, detected_faces=[], faces=[], confiden
 
 # Starting Point of the code
 
-address = './datasets/Face_Dataset_With_Emotion_Age_Ethnicity.json'
+address = './datasets/1.json'
 
 jsonData = []
 images = []
@@ -140,7 +143,7 @@ with codecs.open(address, 'rU', 'utf-8') as js:
     for line in js:
         jsonData.append(json.loads(line))
 
-del jsonData[119]
+del jsonData[272]
 
 # delete any content in face-detection images and loaded-images
 folders = ['./Face_detection_images/','./temp/loaded_images/']
