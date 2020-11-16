@@ -17,7 +17,7 @@ import os, shutil
 def LoadImages():
     imagesCount=0
     facesCount=0
-    for data in tqdm(jsonData[12:14]):
+    for data in tqdm(jsonData[94:95]):
         facesCount += len(data["annotation"])
         response = requests.get(data['content'], stream=True)
         with open('./temp/my_image.jpg', 'wb') as file:
@@ -45,7 +45,7 @@ def FindFaces(count,imagesCount):
         img = face_recognition.load_image_file('./temp/loaded_images/image{}.png'.format(loadedImages))
         h,w,c = img.shape
         cnn_face = dlib.cnn_face_detection_model_v1('./lib/mmod_human_face_detector.dat')
-        if h>2000 and w > 2000:
+        if h>1280 and w > 720:
             img=cv2.resize(img, dsize=(1280,720), interpolation=cv2.INTER_CUBIC)
         cnn_face_detector =cnn_face(img,1)
         if len(cnn_face_detector) > 0:
