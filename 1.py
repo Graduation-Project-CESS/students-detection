@@ -187,6 +187,7 @@ for img in path:
 
           
 
+
 # call "FindFaces()" function and print the number of faces detected using different classifiers
 detectedFacesCount = FindFaces(imagesCount) 
 print("\ndetected", detectedFacesCount, "faces")
