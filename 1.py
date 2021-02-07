@@ -11,7 +11,7 @@ import cvlib as cv
 import face_recognition
 import dlib 
 import os
-
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 '''
 #Load images from URL links in the JSON file to the "Images" list & store them locally to be used by the first classifier.
