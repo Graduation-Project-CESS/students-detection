@@ -1,16 +1,19 @@
 import cv2 
-#import json
-#import codecs
-#import numpy as np
-#import requests
+# import json
+# import codecs
+# import numpy as np
+# import requests
 import shutil
 import glob
-#from PIL import Image
+# from PIL import Image
 from tqdm import tqdm
 import cvlib as cv
 import face_recognition
 import dlib 
 import os
+import time
+from numba import vectorize, jit, cuda 
+
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 '''
@@ -47,20 +50,30 @@ we save one of them but we increase its count(no. of times this face is found)
 if there is a face found only 1 time it is not saved
 we save only faces that are found more than one time
 '''
-
+#@jit(nopython=True)
+#@vectorize(['float64(float64)'], target ="cuda")                         
+#@jit(target ="cuda")                          
 def FindFaces(imagesCount):
     
     detectedFacesCount = 0
     detectedFacesLoc = []  
-    
+    cnn_face = dlib.cnn_face_detection_model_v1('./lib/mmod_human_face_detector.dat')
     for loadedImages in tqdm(range (0, imagesCount)):
         
         img = face_recognition.load_image_file('./temp/loaded_images/image{}.png'.format(loadedImages))
         h,w,c = img.shape
-        cnn_face = dlib.cnn_face_detection_model_v1('./lib/mmod_human_face_detector.dat')
-        if h > 1280 and w > 720:
-            img=cv2.resize(img, dsize=(1280,720), interpolation=cv2.INTER_CUBIC)
-        face_locations =cnn_face(img,1)
+        start_time=time.time()
+        
+        # if h > 1280 and w > 720:
+        #     img=cv2.resize(img, dsize=(1280,720), interpolation=cv2.INTER_CUBIC)
+        face_locations =cnn_face(img,0)
+        print(len(face_locations))
+        if (len(face_locations) == 0):
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print("upscaling")
+            face_locations =cnn_face(img,1)
+        end_time=time.time()
+        print("time : ", end_time - start_time, "sec")
         if (len(face_locations) > 0):  
             for face in face_locations:
                 x1 = face.rect.left()
@@ -159,6 +172,8 @@ imagesCount, facesCount= LoadImages()
 print("\n{} images were loaded successfully, Which contains {} faces".format(imagesCount,facesCount))
 
 '''      
+# dlib.DLIB_USE_CUDA=True
+# print("sadasdasdasdasd",dlib.DLIB_USE_CUDA)
 
 # delete any content in face-detection images and loaded-images
 folders = ['./Face_detection_images/','./temp/loaded_images/']
@@ -179,12 +194,15 @@ for folder in folders:
 path = glob.glob("./images/*.jpg")
 imagesCount=0
 
-for img in path:
+for img in tqdm(path):
     im= cv2.imread(img)
+    h,w,c = im.shape
+    if h > 1280 and w > 720:
+        im=cv2.resize(im, dsize=(1280,720), interpolation=cv2.INTER_CUBIC)
     images.append(im)
     cv2.imwrite('./temp/loaded_images/image{}.png'.format(imagesCount),im)
     imagesCount+=1
-
+print("\nloaded images successfully")
           
 
 
