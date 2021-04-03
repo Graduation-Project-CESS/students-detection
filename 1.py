@@ -22,6 +22,7 @@ def LoadImages():
     imagesCount=0
     facesCount=0
     for data in tqdm(jsonData[20:30]):
+
         facesCount += len(data["annotation"])
         response = requests.get(data['content'], stream=True)
         with open('./temp/my_image.jpg', 'wb') as file:
@@ -85,6 +86,7 @@ def FindFaces(imagesCount):
                 detectedFacesLoc.append([x1,y1,x2,y2,c,count])
                 print("\nCNN:\n")
                 print([x1,y1,x2,y2,c,count])
+
 
 
         try:
@@ -164,7 +166,7 @@ with codecs.open(address, 'rU', 'utf-8') as js:
     for line in js:
         jsonData.append(json.loads(line))
 
-del jsonData[119]
+del jsonData[272]
 
 
 # call "LoadImages()" function & print the total number of images and faces.
